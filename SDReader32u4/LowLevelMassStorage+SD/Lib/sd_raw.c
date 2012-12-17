@@ -10,6 +10,8 @@
 
 #include <string.h>
 #include <avr/io.h>
+#include <avr/wdt.h>
+#include <avr/interrupt.h>
 #include "sd_raw.h"
 #include "Timer.h"
 
@@ -190,18 +192,20 @@ uint8_t sd_raw_init()
 
   sd_raw_spi_init();
 
-  printf("Send SD on command.\r\n");
+  printf("SD on:\n");
 
   /* test SPI IRQ based communication */
+  wdt_enable(WDTO_1S); 
   b = sd_raw_send_command(CMD_SD_ON, 0x12345678);
+  wdt_disable();
+  printf("m");
 
   if (b == 0xff)
   {
-    printf("SD on failed.\r\n");
+    printf("ok");
     return 0;
   }
-
-  printf("SD on success.\r\n");
+  printf("n");
 
   /* initialization procedure */
   sd_raw_card_type = 0;
@@ -256,13 +260,11 @@ void sd_raw_spi_init(void)
  * \param[in] b The byte to sent.
  * \see sd_raw_rec_byte
  */
-void sd_raw_send_byte(uint8_t b)
+inline void sd_raw_send_byte(uint8_t b)
 {
   SPDR = b;
   /* Wait for reception complete */
-  while(!(SPSR & (1<<SPIF)))
-    ;
-  return;
+  while(!(SPSR & (1<<SPIF)));
 }
 
 /**
@@ -272,11 +274,10 @@ void sd_raw_send_byte(uint8_t b)
  * \returns The byte which should be read.
  * \see sd_raw_send_byte
  */
-uint8_t sd_raw_rec_byte()
+inline uint8_t sd_raw_rec_byte()
 {
   /* Wait for reception to complete */
-  while(!(SPSR & (1<<SPIF)))
-    ;
+  while(!(SPSR & (1<<SPIF)));
   /* Return Data Register */
   return SPDR;
 }
@@ -294,6 +295,7 @@ uint8_t sd_raw_send_command(uint8_t command, uint32_t arg)
   uint8_t response;
   uint8_t n_try = 0;
 
+  wdt_enable(WDTO_1S); 
   do
   {
     n_try++;
@@ -302,39 +304,57 @@ uint8_t sd_raw_send_command(uint8_t command, uint32_t arg)
     if (n_try > 1)
     {
       delay(50);
-      printf("Retry ");
+      wdt_reset();
+      printf("y");
     }
     //printf("C %hd %ld\r\n", command, arg);
 
+    LED_on();
+    printf("c");
+    LED_off();
+
+    wdt_reset();
     LED_on();
 
     /* interrupt request */
     irq_high();
 
     /* send command via SPI */
+
+    printf("o");
+    cli();
     sd_raw_send_byte(0x40 | command);
     sd_raw_send_byte((arg >> 24) & 0xff);
+    wdt_reset();
+    printf("p");
     sd_raw_send_byte((arg >> 16) & 0xff);
     sd_raw_send_byte((arg >> 8) & 0xff);
+    wdt_reset();
+    printf("q");
     sd_raw_send_byte((arg >> 0) & 0xff);
-
+    wdt_reset();
     /* receive response */
     response = sd_raw_rec_byte();
+    wdt_reset();
+    sei();
+    printf("x");
 
     /* finish interrupt request */
     irq_low();
 
     LED_off();
 
-    // after 255 trials, fail
-    if (n_try == 0xff)
+    // after 10 trials, fail
+    if (n_try == 0x0a)
     {
+      printf("f");
       response = R1_FAILURE;
       break;
     }
   }
   while (response == R1_WAIT_RETRY);
 
+  wdt_disable();
   return response;
 }
 
