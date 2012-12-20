@@ -58,7 +58,12 @@ void Application_Jump_Check(void)
     /* If the reset source was the bootloader and the key is correct, clear it and jump to the application */
     if ((MCUSR & (1 << WDRF)) && (MagicBootKey == MAGIC_BOOT_KEY))
     {
+        MCUSR &= ~(1<<WDRF);
+        wdt_disable();
+
+        /* Clear the boot key and jump to the user application */
         MagicBootKey = 0;
+
         // cppcheck-suppress constStatement
         ((void (*)(void))0x0000)();
     }
@@ -69,6 +74,7 @@ void Application_Jump_Check(void)
  */
 int main(void)
 {
+    Application_Jump_Check();
     /* Setup hardware required for the bootloader */
     SetupHardware();
     SetupTimer(); // ready to quit bootloader in 5s
@@ -113,8 +119,8 @@ ISR(TIMER1_COMPA_vect)
     timeCntrSeconds++;
  
     if (timeCntrSeconds >= 100)
-        ((void (*)(void))0x0000)();
-        //RunBootloader = false;
+        //((void (*)(void))0x0000)();
+        RunBootloader = false;
     if (timeCntrSeconds % 7 == 0)
     	LED_toggle();
     sei();
