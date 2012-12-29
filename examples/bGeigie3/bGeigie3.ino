@@ -230,10 +230,10 @@ void setup()
   diagnostics();
 
   // Starting now!
-  Serial.println("Starting now!");
+  //Serial.println("Starting now!");
 
   // delay to give time to serial to finish
-  delay(10);
+  //delay(10);
 
 }
 
@@ -254,8 +254,13 @@ void loop()
 
 #if SD_READER_ENABLE
   // First do the SD Reader loop
-  if (sd_reader_init_status)  // but only if it initialized properly
-    sd_reader_loop();
+  //if (sd_reader_init_status)  // but only if it initialized properly
+  //  sd_reader_loop();
+  if (sd_reader_interrupted)
+  {
+    sd_reader_process_interrupt();
+    return;
+  }
 #endif
 
   // We lock the SD reader if possible when executing the loop
@@ -719,6 +724,9 @@ void check_battery_voltage()
 
 void diagnostics()
 {
+  if (sd_reader_interrupted)
+    return; // skip !
+
   char tmp[50];
 
   strcpy_P(tmp, PSTR("--- Diagnostic START ---"));
