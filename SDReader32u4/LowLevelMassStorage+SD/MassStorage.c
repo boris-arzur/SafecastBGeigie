@@ -61,13 +61,13 @@ static int state = IDLE;
 /** Main program entry point. This routine configures the hardware required by the application, then
  *  enters a loop to run the application tasks in sequence.
  */
-
+/*
 ISR(WDT_vect) {
   LED_on();
   delay(10);
   LED_off();
   start("w");
-} 
+} */
 
 int main(void)
 {
@@ -87,7 +87,7 @@ int start(char *msg)
 
   // setup hardware
   SetupHardware();
-  printf(msg);
+  //printf(msg);
 
   for (;;)
   {
@@ -217,7 +217,7 @@ void EVENT_USB_Device_Disconnect(void)
  */
 void EVENT_USB_Device_ConfigurationChanged(void)
 {
-  printf("C");
+  //printf("C");
   
   /* Indicate USB connected and ready */
   //LED_on();
@@ -331,7 +331,7 @@ void MassStorage_Task(void)
   /* Check if a Mass Storage Reset occurred */
   if (IsMassStoreReset)
   {
-    printf("R");
+    //printf("R");
     /* Reset the data endpoint banks */
     Endpoint_ResetFIFO(MASS_STORAGE_OUT_EPNUM);
     Endpoint_ResetFIFO(MASS_STORAGE_IN_EPNUM);
@@ -355,7 +355,7 @@ void MassStorage_Task(void)
  */
 static bool ReadInCommandBlock(void)
 {
-  printf("I");
+  //printf("I");
   /* Select the Data Out endpoint */
   Endpoint_SelectEndpoint(MASS_STORAGE_OUT_EPNUM);
 
@@ -402,7 +402,7 @@ static bool ReadInCommandBlock(void)
  */
 static void ReturnCommandStatus(void)
 {
-  printf("S");
+  //printf("S");
   /* Select the Data Out endpoint */
   Endpoint_SelectEndpoint(MASS_STORAGE_OUT_EPNUM);
 

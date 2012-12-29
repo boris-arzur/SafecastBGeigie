@@ -198,14 +198,14 @@ uint8_t sd_raw_init()
   wdt_enable(WDTO_1S); 
   b = sd_raw_send_command(CMD_SD_ON, 0x12345678);
   wdt_disable();
-  printf("m");
+  //printf("m");
 
   if (b == 0xff)
   {
-    printf("ok");
+    //printf("ok");
     return 0;
   }
-  printf("n");
+  //printf("n");
 
   /* initialization procedure */
   sd_raw_card_type = 0;
@@ -295,7 +295,7 @@ uint8_t sd_raw_send_command(uint8_t command, uint32_t arg)
   uint8_t response;
   uint8_t n_try = 0;
 
-  wdt_enable(WDTO_1S); 
+  //wdt_enable(WDTO_1S); 
   do
   {
     n_try++;
@@ -304,40 +304,40 @@ uint8_t sd_raw_send_command(uint8_t command, uint32_t arg)
     if (n_try > 1)
     {
       delay(50);
-      wdt_reset();
-      printf("y");
+      // wdt_reset();
+      //printf("y");
     }
     //printf("C %hd %ld\r\n", command, arg);
 
-    LED_on();
-    printf("c");
-    LED_off();
+    //LED_on();
+    //printf("c");
+    //LED_off();
 
     wdt_reset();
-    LED_on();
+    //LED_on();
 
     /* interrupt request */
     irq_high();
 
     /* send command via SPI */
 
-    printf("o");
+    //printf("o");
     cli();
     sd_raw_send_byte(0x40 | command);
     sd_raw_send_byte((arg >> 24) & 0xff);
-    wdt_reset();
-    printf("p");
+    //wdt_reset();
+    //printf("p");
     sd_raw_send_byte((arg >> 16) & 0xff);
     sd_raw_send_byte((arg >> 8) & 0xff);
-    wdt_reset();
-    printf("q");
+    //wdt_reset();
+    //printf("q");
     sd_raw_send_byte((arg >> 0) & 0xff);
-    wdt_reset();
+    //wdt_reset();
     /* receive response */
     response = sd_raw_rec_byte();
-    wdt_reset();
+    //wdt_reset();
     sei();
-    printf("x");
+    //printf("x");
 
     /* finish interrupt request */
     irq_low();
@@ -347,14 +347,14 @@ uint8_t sd_raw_send_command(uint8_t command, uint32_t arg)
     // after 10 trials, fail
     if (n_try == 0x0a)
     {
-      printf("f");
+      //printf("f");
       response = R1_FAILURE;
       break;
     }
   }
   while (response == R1_WAIT_RETRY);
 
-  wdt_disable();
+  //wdt_disable();
   return response;
 }
 
