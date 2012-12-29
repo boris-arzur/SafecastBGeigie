@@ -18,7 +18,9 @@ uint8_t buffer[SD_READER_BUF_SIZE];
 uint8_t sd_reader_state = SD_READER_IDLE;
 
 // flag that indicates a 32u4 interrupt occured.
-int sd_reader_interrupted = 0;
+volatile char sd_reader_interrupted = 0;
+
+char is_sd_isr() { return sd_reader_interrupted ; }
 
 // Timeout is 30s
 unsigned long last_interrupt;
