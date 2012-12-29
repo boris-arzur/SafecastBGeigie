@@ -64,8 +64,12 @@ void Application_Jump_Check(void)
         /* Clear the boot key and jump to the user application */
         MagicBootKey = 0;
 
+    	/* Relocate the interrupt vector table to the app section */
+    	MCUCR = (1 << IVCE);
+    	MCUCR = (0 << IVSEL);
         // cppcheck-suppress constStatement
-        ((void (*)(void))0x0000)();
+        //((void (*)(void))0x0000)();
+	asm("jmp 0x0000");
     }
 }
 
@@ -103,7 +107,7 @@ void SetupTimer()
    TCCR1B = (1 << WGM12) | (1 << CS12) | (1 << CS10);  
    TCNT1 = 0;
   
-   OCR1A = 0xFF;
+   OCR1A = 0xFFFF;
    
    TIMSK1 = 1 << OCIE1A;
 
