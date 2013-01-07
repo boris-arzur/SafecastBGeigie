@@ -45,6 +45,7 @@ static const int break_pin = 16;
 // spi helpers
 uint8_t spi_rx_byte();
 void spi_tx_byte(uint8_t b);
+char is_sd_isr();
 
 // routine to call respectively in setup and loop
 int sd_reader_setup();
@@ -63,7 +64,7 @@ uint8_t sd_reader_write_block(uint32_t arg);
 void sd_reader_get_info();
 
 // used to receive data after interrupt from 32u4
-extern int sd_reader_interrupted;
+extern volatile char sd_reader_interrupted;
 void sd_reader_process_interrupt();
 
 #endif /* __SD_READER_INT_H__ */
