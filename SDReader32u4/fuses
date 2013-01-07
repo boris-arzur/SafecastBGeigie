@@ -1,0 +1,1 @@
+avrdude -v -p atmega32u4 -c stk500v1 -P/dev/ttyUSB0 -b 19200 -U lfuse:w:0xff:m -U hfuse:w:0x98:m -U efuse:w:0xf3:m
