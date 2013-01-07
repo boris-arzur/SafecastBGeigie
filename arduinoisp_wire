@@ -1,0 +1,10 @@
+// pin name:    not-mega:         mega(1280 and 2560)
+// slave reset: 10:               53 
+// MOSI:        11:               51 
+// MISO:        12:               50 
+// SCK:         13:               52 
+//
+
+1 |miso  12|vcc    |
+  |sck   13|mosi 11|
+  |reset 10|gnd    |
